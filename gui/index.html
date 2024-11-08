@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Lock Contract</title>
+</head>
+<body>
+   <h1>Lock Contract</h1>
+   <div>
+      <p>Unlock Time: <span id="unlockTime"></span></p>
+      <button id="withdrawBtn">Withdraw</button>
+      <p id="message"></p>
+   </div>
+
+   <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+         // Fetch unlock time
+         const unlockTimeSpan = document.getElementById('unlockTime');
+         const message = document.getElementById('message');
+         try {
+            const response = await fetch('/unlockTime');
+            const data = await response.json();
+            unlockTimeSpan.textContent = new Date(data.unlockTime * 1000).toLocaleString();
+         } catch (err) {
+            unlockTimeSpan.textContent = 'Error fetching unlock time';
+         }
+
+         // Withdraw funds
+         const withdrawBtn = document.getElementById('withdrawBtn');
+         withdrawBtn.addEventListener('click', async () => {
+            try {
+               const response = await fetch('/withdraw', {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json'
+                  }
+               });
+               const data = await response.json();
+               if (data.error) {
+                  message.textContent = `Error: ${data.error}`;
+               } else {
+                  message.textContent = `Success! TxHash: ${data.txHash}`;
+               }
+            } catch (err) {
+               message.textContent = 'Error during withdrawal';
+            }
+         });
+      });
+   </script>
+</body>
+</html>
